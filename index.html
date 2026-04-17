@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Email Bot</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #38bdf8;
+            --text: #f8fafc;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; border: 1px solid #334155; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        .info { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 25px; }
+        label { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 8px; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #334155; border-radius: 10px; background: var(--bg); color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: var(--primary); color: var(--bg); border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        #output { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-size: 0.9rem; border: 1px solid #38bdf8; background: rgba(56, 189, 248, 0.1); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🤖 GEMINI EMAIL BOT</h2>
+    <div class="info">Pengirim: Gemini Bot<br>(muhammadluthfi56212@gmail.com)</div>
+    
+    <form id="botForm">
+        <label>OBJECT / SUBJECT:</label>
+        <input type="text" id="subject" placeholder="Subjek email..." required>
+
+        <label>ALAMAT EMAIL TUJUAN:</label>
+        <input type="email" id="email_to" placeholder="tujuan@gmail.com" required>
+
+        <label>INPUT PESAN BOT:</label>
+        <textarea id="message" rows="4" placeholder="Tulis pesan..." required></textarea>
+
+        <button type="submit" id="btnSend">TOMBOL SEND</button>
+    </form>
+
+    <div id="output"></div>
+</div>
+
+<script type="text/javascript">
+    // Hubungkan ke EmailJS menggunakan data dari konfigurasi kamu
+    // Jika tidak menggunakan server, isi string di bawah ini secara manual
+    const CONFIG = {
+        PUBLIC_KEY: "MASUKKAN_DARI_ENV", 
+        SERVICE_ID: "MASUKKAN_DARI_ENV",
+        TEMPLATE_ID: "MASUKKAN_DARI_ENV"
+    };
+
+    (function() {
+        emailjs.init(CONFIG.PUBLIC_KEY);
+    })();
+
+    document.getElementById('botForm').onsubmit = function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSend');
+        const out = document.getElementById('output');
+        
+        btn.innerText = "MENGIRIM...";
+        btn.disabled = true;
+
+        const params = {
+            from_name: "Gemini Bot",
+            subject: document.getElementById('subject').value,
+            email_to: document.getElementById('email_to').value,
+            message: document.getElementById('message').value
+        };
+
+        emailjs.send(CONFIG.SERVICE_ID, CONFIG.TEMPLATE_ID, params)
+            .then(() => {
+                out.style.display = "block";
+                out.innerHTML = `<strong>HASIL:</strong> Pesan berhasil dikirim ke ${params.email_to}`;
+                btn.innerText = "TOMBOL SEND";
+                btn.disabled = false;
+                e.target.reset();
+            }, (err) => {
+                out.style.display = "block";
+                out.style.borderColor = "red";
+                out.innerHTML = "<strong>GAGAL:</strong> " + JSON.stringify(err);
+                btn.innerText = "TOMBOL SEND";
+                btn.disabled = false;
+            });
+    };
+</script>
+
+</body>
+</html>
