@@ -11,16 +11,19 @@
             --card: #1e293b;
             --primary: #38bdf8;
             --text: #f8fafc;
+            --border: #334155;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 400px; border: 1px solid #334155; }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
-        .info { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 25px; }
-        label { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 8px; }
-        input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #334155; border-radius: 10px; background: var(--bg); color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; background: var(--primary); color: var(--bg); border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        #output { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-size: 0.9rem; border: 1px solid #38bdf8; background: rgba(56, 189, 248, 0.1); }
+        .container { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 100%; max-width: 400px; border: 1px solid var(--border); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 5px; font-size: 1.5rem; }
+        .info { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        label { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 8px; color: #cbd5e1; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; background: #0f172a; color: #fff; box-sizing: border-box; font-size: 14px; transition: 0.3s; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 8px rgba(56, 189, 248, 0.2); }
+        button { width: 100%; padding: 14px; background: var(--primary); color: var(--bg); border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3); }
+        button:disabled { background: #64748b; cursor: not-allowed; transform: none; }
+        #output { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-size: 0.9rem; line-height: 1.5; border: 1px solid var(--primary); background: rgba(56, 189, 248, 0.1); }
     </style>
 </head>
 <body>
@@ -33,11 +36,11 @@
         <label>OBJECT / SUBJECT:</label>
         <input type="text" id="subject" placeholder="Subjek email..." required>
 
-        <label>ALAMAT EMAIL TUJUAN:</label>
+        <label>ALAMAT EMAIL YANG DITUJU:</label>
         <input type="email" id="email_to" placeholder="tujuan@gmail.com" required>
 
-        <label>INPUT PESAN BOT:</label>
-        <textarea id="message" rows="4" placeholder="Tulis pesan..." required></textarea>
+        <label>INPUT PESAN YANG INGIN DIKIRIMKAN BOT:</label>
+        <textarea id="message" rows="4" placeholder="Tulis pesan di sini..." required></textarea>
 
         <button type="submit" id="btnSend">TOMBOL SEND</button>
     </form>
@@ -46,44 +49,49 @@
 </div>
 
 <script type="text/javascript">
-    // Hubungkan ke EmailJS menggunakan data dari konfigurasi kamu
-    // Jika tidak menggunakan server, isi string di bawah ini secara manual
+    // --- KONFIGURASI ---
+    // Pindahkan nilai dari file .env ke sini jika dijalankan di browser lokal
     const CONFIG = {
-        PUBLIC_KEY: "MASUKKAN_DARI_ENV", 
-        SERVICE_ID: "MASUKKAN_DARI_ENV",
-        TEMPLATE_ID: "MASUKKAN_DARI_ENV"
+        PUBLIC_KEY: "MASUKKAN_PUBLIC_KEY", 
+        SERVICE_ID: "MASUKKAN_SERVICE_ID",
+        TEMPLATE_ID: "MASUKKAN_TEMPLATE_ID"
     };
 
     (function() {
         emailjs.init(CONFIG.PUBLIC_KEY);
     })();
 
-    document.getElementById('botForm').onsubmit = function(e) {
+    const form = document.getElementById('botForm');
+    const output = document.getElementById('output');
+    const btn = document.getElementById('btnSend');
+
+    form.onsubmit = function(e) {
         e.preventDefault();
-        const btn = document.getElementById('btnSend');
-        const out = document.getElementById('output');
         
-        btn.innerText = "MENGIRIM...";
+        btn.innerText = "SEDANG MENGIRIM...";
         btn.disabled = true;
 
         const params = {
             from_name: "Gemini Bot",
             subject: document.getElementById('subject').value,
             email_to: document.getElementById('email_to').value,
-            message: document.getElementById('message').value
+            message: document.getElementById('message').value,
+            reply_to: "muhammadluthfi56212@gmail.com"
         };
 
+        // Mengirim email via EmailJS
         emailjs.send(CONFIG.SERVICE_ID, CONFIG.TEMPLATE_ID, params)
             .then(() => {
-                out.style.display = "block";
-                out.innerHTML = `<strong>HASIL:</strong> Pesan berhasil dikirim ke ${params.email_to}`;
+                output.style.display = "block";
+                output.style.borderColor = "#38bdf8";
+                output.innerHTML = `<strong>OUTPUT/HASIL PESAN TERKIRIM:</strong><br>✅ Pesan berhasil dikirim ke: ${params.email_to}`;
                 btn.innerText = "TOMBOL SEND";
                 btn.disabled = false;
-                e.target.reset();
+                form.reset();
             }, (err) => {
-                out.style.display = "block";
-                out.style.borderColor = "red";
-                out.innerHTML = "<strong>GAGAL:</strong> " + JSON.stringify(err);
+                output.style.display = "block";
+                output.style.borderColor = "#f87171";
+                output.innerHTML = "<strong>GAGAL:</strong> " + (err.text || "Terjadi kesalahan sistem.");
                 btn.innerText = "TOMBOL SEND";
                 btn.disabled = false;
             });
